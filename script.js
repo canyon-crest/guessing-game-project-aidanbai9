@@ -78,7 +78,7 @@ function play(){
     }
     answer = Math.floor(Math.random()*level)+1;
     msg.textContent = "Guess a number between 1-" + level;
-    guess.placeholder = answer;
+    //guess.placeholder = answer;
     score = 0;
 }
 
