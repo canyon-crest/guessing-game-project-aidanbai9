@@ -6,6 +6,7 @@ const levelArr = document.getElementsByName("level");
 const scoreArr = [];
 const timesArr = [];
 initT();
+homeScreen();
 // global variables/constants
 
 
@@ -15,10 +16,29 @@ submitName.addEventListener("click", updateName);
 guessBtn.addEventListener("click", makeGuess);
 giveUp.addEventListener("click", giveup);
 
+function homeScreen(){
+    inGame=0;
+    guessBtn.disabled=true;
+    giveUp.disabled=true;
+    guess.value = "";
+    guess.placeholder = "";
+    guess.disabled=true;
+    playBtn.disabled = true;
+    for(let i = 0; i<levelArr.length; i++){
+        levelArr[i].disabled=true;
+    }
+}
+
 function updateName(){
     username=inputName.value;
     intro.textContent="Hi, "+username; 
     msg.textContent=username+", Please Select a Level";
+    inputName.disabled=true;
+    submitName.disabled=true;
+    playBtn.disabled = false;
+    for(let i = 0; i<levelArr.length; i++){
+        levelArr[i].disabled=false;
+    }
 }
 
 function initT(){
@@ -105,12 +125,13 @@ function makeGuess(){
     }else{
         feedback.textContent = "UR COLD";
     }
+    feedback.textContent+=", You've used "+score+" guess(es)";
     if(userGuess>answer){
         msg.textContent = "TOO HIGH";
     }else if(userGuess<answer){
         msg.textContent = "TOO LOW";
     }else{
-        feedback.textContent = "U GOT IT IN "+score+" TRIES";
+        feedback.textContent = "U GOT IT IN "+score+" GUESS(ES)";
         reset();
         updateScore();
         updateTime();
@@ -173,13 +194,13 @@ function updateScore(){
 }
 
 function updateTime(){
-    timesArr.push(((curT-startT)/1000).toFixed(2));scoreArr.push(score);
+    timesArr.push(((curT-startT)/1000).toFixed(2));
     let sum=0;
     timesArr.sort((a, b) => a - b); // sorts ascending
     //leaderboard?
     const lb = document.getElementsByName("times");
     for(let i = 0; i<timesArr.length; i++){
-        sum+=timesArr[i];
+        sum+=Number(timesArr[i]);
         if(i<lb.length){
             lb[i].textContent = timesArr[i];
         }
