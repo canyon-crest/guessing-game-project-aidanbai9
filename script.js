@@ -1,20 +1,34 @@
-initT();
-// global variables/constants
-let score, answer, level;
+
+let score, answer, level, startT,curT;
+let inGame=0;
+let username="";
 const levelArr = document.getElementsByName("level");
 const scoreArr = [];
+const timesArr = [];
+initT();
+// global variables/constants
+
 
 // event listeners
 playBtn.addEventListener("click", play);
+submitName.addEventListener("click", updateName);
 guessBtn.addEventListener("click", makeGuess);
+giveUp.addEventListener("click", giveup);
+
+function updateName(){
+    username=inputName.value;
+    intro.textContent="Hi, "+username; 
+    msg.textContent=username+", Please Select a Level";
+}
 
 function initT(){
     time();
-    interval=setInterval(time,1000);
+    interval=setInterval(time,1);
 }
 
 function time(){
     let d = new Date();
+    curT=new Date();
     let currentHour = d.getHours();
     let currentMinute = d.getMinutes();
     let currentSecond = d.getSeconds();
@@ -38,15 +52,24 @@ function time(){
     }else if(d.getDate()%10==3){
         suffix="rd";
     }
+    if(inGame==0){
+        gameTimer.textContent="Time: 0s";
+    }else{
+        gameTimer.textContent="Time: "+((curT-startT)/1000).toFixed(2)+"s";
+    }
     d = months[d.getMonth()] + " " + d.getDate() + suffix + ", " + d.getFullYear();
     // update here
     date.textContent = d;
     curTime.textContent = "Current Time: "+ currentHour + ":"+currentMinute+":"+currentSecond;
 }
 function play(){
+    inGame=1;
+    startT=new Date();
     playBtn.disabled = true;
+    giveUp.disabled=false;
     guessBtn.disabled = false;
     guess.disabled = false;
+    feedback.textContent="";
     for(let i = 0; i<levelArr.length; i++) {
         levelArr[i].disabled = true;
         if(levelArr[i].checked ){
@@ -58,6 +81,15 @@ function play(){
     guess.placeholder = answer;
     score = 0;
 }
+
+function giveup(){
+    score=level;
+    feedback.textContent = "U GAVE UP YOUR SCORE IS "+score;
+    reset();
+    updateScore();
+    updateTime();
+}
+
 function makeGuess(){
     let userGuess = Number(guess.value);
     if(isNaN(userGuess) || userGuess<1 || userGuess > level){
@@ -65,18 +97,29 @@ function makeGuess(){
         return;
     }
     score++;
+    let dif=Math.abs(userGuess-answer);
+    if(dif<=Math.ceil(level/20)){
+        feedback.textContent = "UR HOT";
+    }else if(dif<=Math.ceil(level/6)){
+        feedback.textContent = "UR WARM";
+    }else{
+        feedback.textContent = "UR COLD";
+    }
     if(userGuess>answer){
         msg.textContent = "TOO HIGH";
     }else if(userGuess<answer){
         msg.textContent = "TOO LOW";
     }else{
-        msg.textContent = "U GOT IT IN "+score+" TRIES";
+        feedback.textContent = "U GOT IT IN "+score+" TRIES";
         reset();
         updateScore();
+        updateTime();
     }
 }
 function reset(){
+    inGame=0;
     guessBtn.disabled=true;
+    giveUp.disabled=true;
     guess.value = "";
     guess.placeholder = "";
     guess.disabled=true;
@@ -127,4 +170,20 @@ function updateScore(){
     }
     sum/=scoreArr.length;
     avgScore.textContent = "Average Score: "+sum.toFixed(2);
+}
+
+function updateTime(){
+    timesArr.push(((curT-startT)/1000).toFixed(2));scoreArr.push(score);
+    let sum=0;
+    timesArr.sort((a, b) => a - b); // sorts ascending
+    //leaderboard?
+    const lb = document.getElementsByName("times");
+    for(let i = 0; i<timesArr.length; i++){
+        sum+=timesArr[i];
+        if(i<lb.length){
+            lb[i].textContent = timesArr[i];
+        }
+    }
+    sum/=timesArr.length;
+    avgTime.textContent = "Average Time: "+sum.toFixed(2);
 }
