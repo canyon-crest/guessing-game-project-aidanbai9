@@ -30,7 +30,7 @@ function homeScreen(){
 }
 
 function updateName(){
-    username=inputName.value;
+    username=inputName.value.charAt(0).toUpperCase()+inputName.value.slice(1).toLowerCase();
     intro.textContent="Hi, "+username; 
     msg.textContent=username+", Please Select a Level";
     inputName.disabled=true;
@@ -97,14 +97,14 @@ function play(){
         }
     }
     answer = Math.floor(Math.random()*level)+1;
-    msg.textContent = "Guess a number between 1-" + level;
+    msg.textContent = username+", Guess a number between 1-" + level;
     //guess.placeholder = answer;
     score = 0;
 }
 
 function giveup(){
     score=level;
-    feedback.textContent = "U GAVE UP YOUR SCORE IS "+score;
+    feedback.textContent = username+", U GAVE UP YOUR SCORE IS "+score;
     reset();
     updateScore();
     updateTime();
@@ -112,26 +112,42 @@ function giveup(){
 
 function makeGuess(){
     let userGuess = Number(guess.value);
+    guess.value="";
     if(isNaN(userGuess) || userGuess<1 || userGuess > level){
-        msg.textContent = "INVALID, guess a number!";
+        msg.textContent = username+", INVALID, guess a number!";
         return;
     }
     score++;
     let dif=Math.abs(userGuess-answer);
-    if(dif<=Math.ceil(level/20)){
+    // update visual hint classes (JS-induced CSS)
+    feedback.classList.remove('hint-hot','hint-warm','hint-cold','hint-success');
+    if(dif===0){
+        feedback.classList.add('hint-success');
+        feedback.textContent = "U GOT IT";
+    } else if(dif<=Math.ceil(level/20)){
+        feedback.classList.add('hint-hot');
         feedback.textContent = "UR HOT";
     }else if(dif<=Math.ceil(level/6)){
+        feedback.classList.add('hint-warm');
         feedback.textContent = "UR WARM";
     }else{
+        feedback.classList.add('hint-cold');
         feedback.textContent = "UR COLD";
     }
-    feedback.textContent+=", You've used "+score+" guess(es)";
+    feedback.textContent = feedback.textContent + ", "+username+", You've used "+score+" guess(es)";
     if(userGuess>answer){
         msg.textContent = "TOO HIGH";
     }else if(userGuess<answer){
         msg.textContent = "TOO LOW";
     }else{
-        feedback.textContent = "U GOT IT IN "+score+" GUESS(ES)";
+        // final success message and celebration
+        feedback.textContent = username+", U GOT IT IN "+score+" GUESS(ES)";
+        // add a celebration class to the body, then remove it after 2s
+        document.body.classList.add('celebrate');
+        setTimeout(()=>{
+            document.body.classList.remove('celebrate');
+        }, 2000);
+
         reset();
         updateScore();
         updateTime();
