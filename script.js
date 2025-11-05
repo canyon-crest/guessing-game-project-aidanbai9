@@ -178,16 +178,17 @@ function updateScore(){
         }
     }
     scoreArr.push(score);
-    wins.textContent = "Total wins: "+scoreArr.length;
+    wins.textContent = "Total games played: "+scoreArr.length;
     let sum=0;
     scoreArr.sort((a, b) => a - b); // sorts ascending
     //leaderboard?
     const lb = document.getElementsByName("leaderboard");
     for(let i = 0; i<scoreArr.length; i++){
-        sum+=scoreArr[i];
+        sum+=Number(scoreArr[i]);
         if(i<lb.length){
             lb[i].textContent = scoreArr[i];
         }
+        console.log(scoreArr[i]);
     }
     sum/=scoreArr.length;
     avgScore.textContent = "Average Score: "+sum.toFixed(2);
