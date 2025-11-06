@@ -1,5 +1,5 @@
 
-let score, answer, level, startT,curT;
+let score, answer, level, startT,curT,winNum=0;
 let inGame=0;
 let username="";
 const levelArr = document.getElementsByName("level");
@@ -105,6 +105,7 @@ function play(){
 function giveup(){
     score=level;
     feedback.textContent = username+", U GAVE UP YOUR SCORE IS "+score;
+    winNum--;
     reset();
     updateScore();
     updateTime();
@@ -136,9 +137,9 @@ function makeGuess(){
     }
     feedback.textContent = feedback.textContent + ", "+username+", You've used "+score+" guess(es)";
     if(userGuess>answer){
-        msg.textContent = "TOO HIGH";
+        msg.textContent = "TOO HIGH, guess lower";
     }else if(userGuess<answer){
-        msg.textContent = "TOO LOW";
+        msg.textContent = "TOO LOW, guess higher";
     }else{
         // final success message and celebration
         feedback.textContent = username+", U GOT IT IN "+score+" GUESS(ES)";
@@ -154,6 +155,7 @@ function makeGuess(){
     }
 }
 function reset(){
+    winNum++;
     inGame=0;
     guessBtn.disabled=true;
     giveUp.disabled=true;
@@ -195,6 +197,7 @@ function updateScore(){
     }
     scoreArr.push(score);
     wins.textContent = "Total games played: "+scoreArr.length;
+    numWins.textContent="Total Games won: "+winNum;
     let sum=0;
     scoreArr.sort((a, b) => a - b); // sorts ascending
     //leaderboard?
